@@ -1,9 +1,9 @@
-name: Extrair Nome da Branch no Merge
+name: Extrair Nome da Branch de Origem
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types:
+      - closed
 
 jobs:
   obter-nome-da-branch:
@@ -15,9 +15,10 @@ jobs:
 
     - name: Configurar variáveis de ambiente
       run: |
-        export BRANCH_NAME=$(echo $GITHUB_REF | awk 'BEGIN{FS="/"} {print $3}')
+        PR_URL=$(jq -r .pull_request.url "$GITHUB_EVENT_PATH")
+        BRANCH_NAME=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" $PR_URL | jq -r .head.ref)
         echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
-    - name: Imprimir o nome da branch
+    - name: Imprimir o nome da branch de origem
       run: |
-        echo "O nome da branch mergeada na master é $BRANCH_NAME"
+        echo "O nome da branch de origem do PR é $BRANCH_NAME"
