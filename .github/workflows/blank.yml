@@ -1,0 +1,23 @@
+name: Extrair Nome da Branch no Merge
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  obter-nome-da-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v2
+
+    - name: Configurar variáveis de ambiente
+      run: |
+        export BRANCH_NAME=$(echo $GITHUB_REF | awk 'BEGIN{FS="/"} {print $3}')
+        echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+    - name: Imprimir o nome da branch
+      run: |
+        echo "O nome da branch mergeada na master é $BRANCH_NAME"
